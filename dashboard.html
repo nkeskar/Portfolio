@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>University Innovation Redeployment Research | Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --bg-2:#F0F3F8; --ink:#0A0F1A; --ink-dim:#4B5768;
+    --blue:#1B4B91; --blue-soft:#2C6CB5; --blue-pale:#E7EEF7;
+    --hairline:rgba(10,15,26,0.12); --hairline-strong:rgba(10,15,26,0.28);
+    --serif:'Fraunces', serif; --sans:'Inter', sans-serif; --mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.55;}
+  a{color:var(--blue);}
+  .wrap{max-width:1080px; margin:0 auto; padding:56px 6vw 100px;}
+
+  .back{font-family:var(--mono); font-size:0.78rem; color:var(--ink-dim); display:inline-block; margin-bottom:28px;}
+  .back:hover{color:var(--blue);}
+
+  header{border-top:2px solid var(--ink); border-bottom:1px solid var(--hairline-strong); padding:32px 0; margin-bottom:48px;}
+  .eyebrow{font-family:var(--mono); font-size:0.72rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--blue); margin-bottom:14px;}
+  h1{font-family:var(--serif); font-weight:600; font-size:clamp(1.8rem,4vw,2.6rem); margin-bottom:12px;}
+  .sub{color:var(--ink-dim); font-size:0.98rem; max-width:640px;}
+
+  .stat-strip{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--hairline); margin-bottom:64px; border:1px solid var(--hairline);}
+  .stat{background:var(--bg); padding:22px 20px; text-align:center;}
+  .stat .num{font-family:var(--serif); font-weight:600; font-size:1.8rem; color:var(--blue);}
+  .stat .label{font-family:var(--mono); font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-dim); margin-top:4px;}
+
+  section{margin-bottom:72px;}
+  h2{font-family:var(--serif); font-weight:600; font-size:1.4rem; margin-bottom:8px;}
+  .section-note{color:var(--ink-dim); font-size:0.9rem; margin-bottom:28px; max-width:680px;}
+
+  /* index cards */
+  .index-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1px; background:var(--hairline); border:1px solid var(--hairline);}
+  .index-card{background:var(--bg); padding:24px;}
+  .index-card h3{font-family:var(--serif); font-size:1.05rem; margin-bottom:8px;}
+  .index-card .weight{font-family:var(--mono); font-size:0.72rem; color:var(--blue); margin-bottom:10px; display:block;}
+  .index-card p{font-size:0.85rem; color:var(--ink-dim); margin-bottom:10px;}
+  .index-card ul{list-style:none; font-size:0.82rem; color:var(--ink-dim);}
+  .index-card li{padding:2px 0; padding-left:14px; position:relative;}
+  .index-card li::before{content:'-'; position:absolute; left:0; color:var(--hairline-strong);}
+
+  /* bar chart */
+  .bar-row{display:grid; grid-template-columns:28px 1fr 190px 46px; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid var(--hairline);}
+  .bar-row:first-child{border-top:1px solid var(--hairline);}
+  .bar-rank{font-family:var(--mono); font-size:0.75rem; color:var(--ink-dim); text-align:right;}
+  .bar-name{font-size:0.88rem;}
+  .bar-name b{font-weight:600;}
+  .bar-track{height:14px; background:var(--bg-2); position:relative; overflow:hidden;}
+  .bar-fill{height:100%; background:var(--blue-soft); transition:width 0.6s ease;}
+  .bar-row.top5 .bar-fill{background:var(--blue);}
+  .bar-score{font-family:var(--mono); font-size:0.8rem; text-align:right;}
+
+  /* quadrant */
+  .quadrant-wrap{position:relative; width:100%; max-width:760px; aspect-ratio:16/10; margin:0 auto; border:1px solid var(--ink);}
+  .quad-bg{position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;}
+  .quad-bg div{border:1px solid var(--hairline);}
+  .quad-bg .tl{background:var(--blue-pale);}
+  .quad-bg .tr{background:#EAF3EC;}
+  .quad-bg .bl{background:var(--bg-2);}
+  .quad-bg .br{background:#FBEDE9;}
+  .quad-label{position:absolute; font-family:var(--mono); font-size:0.62rem; letter-spacing:0.04em; color:var(--ink-dim); text-transform:uppercase; max-width:150px; line-height:1.4;}
+  .axis-label{position:absolute; font-family:var(--mono); font-size:0.7rem; color:var(--ink-dim); letter-spacing:0.05em;}
+  .dot{position:absolute; width:11px; height:11px; border-radius:50%; background:var(--ink-dim); transform:translate(-50%,-50%); cursor:default; border:1.5px solid var(--bg);}
+  .dot.top5{background:var(--blue); width:14px; height:14px;}
+  .dot-label{position:absolute; font-family:var(--mono); font-size:0.62rem; white-space:nowrap; color:var(--ink); transform:translate(8px,-50%);}
+  .legend{display:flex; gap:24px; margin-top:18px; font-family:var(--mono); font-size:0.72rem; color:var(--ink-dim); flex-wrap:wrap;}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .legend .swatch{width:10px; height:10px; border-radius:50%;}
+
+  /* table */
+  table{width:100%; border-collapse:collapse; font-size:0.85rem;}
+  th{font-family:var(--mono); font-size:0.68rem; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-dim); text-align:left; padding:10px 12px; border-bottom:1px solid var(--ink);}
+  td{padding:10px 12px; border-bottom:1px solid var(--hairline);}
+  tr.top5 td{font-weight:600;}
+  .num-cell{font-family:var(--mono); text-align:right;}
+
+  footer{text-align:center; padding:40px 0 0; font-family:var(--mono); font-size:0.7rem; color:var(--ink-dim); border-top:1px solid var(--hairline);}
+
+  @media (max-width:700px){
+    .bar-row{grid-template-columns:22px 1fr 90px 40px; gap:8px;}
+    table{font-size:0.75rem;}
+    th,td{padding:8px 6px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="index.html">&larr; Back to portfolio</a>
+
+  <header>
+    <div class="eyebrow">Innovation Screening</div>
+    <h1>University Innovation Redeployment Research</h1>
+    <p class="sub">A three-index scoring model screening 101 U.S. public universities on their capacity and willingness to redeploy idle R&amp;D capital into startup collaboration, narrowed to a ranked Top 20 target list.</p>
+  </header>
+
+  <div class="stat-strip">
+    <div class="stat"><div class="num">101</div><div class="label">Universities Screened</div></div>
+    <div class="stat"><div class="num">24</div><div class="label">Scoring Parameters</div></div>
+    <div class="stat"><div class="num">20</div><div class="label">Deep-Dive Shortlist</div></div>
+    <div class="stat"><div class="num">3</div><div class="label">Index Categories</div></div>
+  </div>
+
+  <section>
+    <h2>Scoring Model</h2>
+    <p class="section-note">Each university is scored across three weighted indices, then ranked by composite score out of 100.</p>
+    <div class="index-grid">
+      <div class="index-card">
+        <h3>Talent Surplus</h3>
+        <span class="weight">Weight: 30% &middot; Higher = Better</span>
+        <p>Capacity across key academic and research domains.</p>
+        <ul><li>R&amp;D expenditure, endowment, federal funding</li><li>STEM PhD &amp; graduate population</li><li>Engineering / CS / life sciences faculty</li></ul>
+      </div>
+      <div class="index-card">
+        <h3>Commercialization Gap</h3>
+        <span class="weight">Weight: 50% &middot; Higher = Worse (flipped)</span>
+        <p>Translation performance from research to market.</p>
+        <ul><li>Patent filings &amp; citation index</li><li>SBIR/STTR awards, corporate partnerships</li><li>Alumni founder density &amp; VC funding</li></ul>
+      </div>
+      <div class="index-card">
+        <h3>Resource Scarcity</h3>
+        <span class="weight">Weight: 20% &middot; Higher = Worse (flipped)</span>
+        <p>Depth of local ecosystem and institutional support.</p>
+        <ul><li>Innovation center budget, NSF I-Corps</li><li>VC funding in metro area</li><li>Distance to nearest tech hub</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>FI Targeting Matrix</h2>
+    <p class="section-note">Universities plotted by Capacity Input (R&amp;D $, patents, talent) against Conversion Efficiency (startups, revenue, VC). The bottom-right quadrant, high capacity paired with low conversion efficiency, is the highest-value target zone: research strength that isn't yet translating to commercial outcomes.</p>
+    <div class="quadrant-wrap" id="quadrant">
+      <div class="quad-bg"><div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div></div>
+      <div class="quad-label" style="top:6%; left:3%;">Low capacity + high efficiency<br>Lean Innovators</div>
+      <div class="quad-label" style="top:6%; right:3%; text-align:right;">High capacity + high efficiency<br>Established Hubs</div>
+      <div class="quad-label" style="bottom:6%; left:3%;">Low capacity + low efficiency<br>Non-Target</div>
+      <div class="quad-label" style="bottom:6%; right:3%; text-align:right;">High capacity + low efficiency<br>Innovation Gap (FI Target)</div>
+      <div class="axis-label" style="bottom:-26px; left:50%; transform:translateX(-50%);">Dimension 1: Capacity Input &rarr;</div>
+      <div class="axis-label" style="left:-52px; top:50%; transform:translateY(-50%) rotate(180deg); writing-mode:vertical-rl; white-space:nowrap;">Dimension 2: Conversion Efficiency &rarr;</div>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--blue);"></span>Top 5 target universities</span>
+      <span><span class="swatch" style="background:var(--ink-dim);"></span>Rank 6&ndash;20</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Top 20 University Rankings</h2>
+    <p class="section-note">Final score blends all three indices; bars below show the composite score out of 100.</p>
+    <div id="barchart"></div>
+  </section>
+
+  <section>
+    <h2>Full Ranking Detail</h2>
+    <table>
+      <thead><tr><th>#</th><th>University</th><th class="num-cell">Comm. Gap</th><th class="num-cell">Res. Scarcity</th><th class="num-cell">Score</th></tr></thead>
+      <tbody id="tablebody"></tbody>
+    </table>
+  </section>
+
+  <footer>Illustrative dashboard reproduction, May 2026.</footer>
+
+</div>
+
+<script>
+const data = [
+  {rank:1, name:"University of North Florida", comm:18, res:35, score:69.6, x:78, y:62},
+  {rank:2, name:"North Dakota State University", comm:42, res:25, score:69.4, x:85, y:15},
+  {rank:3, name:"Montana State University", comm:37, res:27, score:67.5, x:78, y:28},
+  {rank:4, name:"Mississippi State University", comm:42, res:24, score:67.3, x:72, y:25},
+  {rank:5, name:"University of South Carolina", comm:32, res:28, score:66.9, x:65, y:40},
+  {rank:6, name:"Florida State University", comm:35, res:24, score:65.9, x:62, y:55},
+  {rank:7, name:"University of South Alabama", comm:23, res:29, score:64.0, x:90, y:55},
+  {rank:8, name:"University of Delaware", comm:42, res:25, score:63.8, x:72, y:13},
+  {rank:9, name:"The Pennsylvania State University", comm:47, res:20, score:63.4, x:40, y:13},
+  {rank:10, name:"Auburn University", comm:41, res:23, score:62.3, x:62, y:33},
+  {rank:11, name:"Oakland University", comm:21, res:32, score:61.9, x:92, y:68},
+  {rank:12, name:"Univ. of California, Merced", comm:26, res:29, score:60.8, x:68, y:45},
+  {rank:13, name:"University of Nevada, Reno", comm:43, res:19, score:60.8, x:52, y:38},
+  {rank:14, name:"University of Cincinnati", comm:41, res:20, score:60.2, x:45, y:40},
+  {rank:15, name:"S. Illinois Univ. Carbondale", comm:21, res:26, score:57.6, x:70, y:85},
+  {rank:16, name:"Univ. of Tennessee, Knoxville", comm:41, res:17, score:56.4, x:48, y:44},
+  {rank:17, name:"University of Georgia", comm:46, res:15, score:53.4, x:20, y:30},
+  {rank:18, name:"Northern Illinois University", comm:19, res:26, score:52.5, x:78, y:92},
+  {rank:19, name:"Temple University", comm:27, res:22, score:51.8, x:40, y:78},
+  {rank:20, name:"Univ. of Maryland, College Park", comm:52, res:12, score:51.4, x:25, y:15},
+];
+
+const maxScore = 70;
+
+// quadrant dots
+const q = document.getElementById('quadrant');
+data.forEach(d => {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (d.rank <= 5 ? ' top5' : '');
+  dot.style.left = d.x + '%';
+  dot.style.top = (100 - d.y) + '%';
+  dot.title = '#' + d.rank + ' ' + d.name + ' (' + d.score + ')';
+  q.appendChild(dot);
+  if (d.rank <= 5) {
+    const lbl = document.createElement('div');
+    lbl.className = 'dot-label';
+    lbl.style.left = d.x + '%';
+    lbl.style.top = (100 - d.y) + '%';
+    lbl.textContent = '#' + d.rank;
+    q.appendChild(lbl);
+  }
+});
+
+// bar chart
+const bc = document.getElementById('barchart');
+data.forEach(d => {
+  const row = document.createElement('div');
+  row.className = 'bar-row' + (d.rank <= 5 ? ' top5' : '');
+  row.innerHTML = `
+    <div class="bar-rank">${d.rank}</div>
+    <div class="bar-name">${d.rank <= 5 ? '<b>' + d.name + '</b>' : d.name}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+    <div class="bar-score">${d.score}</div>
+  `;
+  bc.appendChild(row);
+  requestAnimationFrame(() => {
+    row.querySelector('.bar-fill').style.width = (d.score / maxScore * 100) + '%';
+  });
+});
+
+// table
+const tb = document.getElementById('tablebody');
+data.forEach(d => {
+  const tr = document.createElement('tr');
+  if (d.rank <= 5) tr.className = 'top5';
+  tr.innerHTML = `<td>${d.rank}</td><td>${d.name}</td><td class="num-cell">${d.comm}</td><td class="num-cell">${d.res}</td><td class="num-cell">${d.score}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+</body>
+</html>
